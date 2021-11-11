@@ -1,0 +1,49 @@
+plugins {
+    id 'com.android.application'
+}
+apply plugin: 'kotlin-android'
+
+android {
+    compileSdkVersion 31
+    buildToolsVersion "31.0.0"
+
+    defaultConfig {
+        applicationId "li.power.app.wearos.teslanak"
+        minSdkVersion 30
+        targetSdkVersion 31
+        versionCode 1
+        versionName "1.0"
+
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    buildFeatures {
+        viewBinding true
+    }
+}
+
+dependencies {
+
+    implementation 'com.google.android.gms:play-services-wearable:17.0.0'
+    implementation 'androidx.percentlayout:percentlayout:1.0.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation 'androidx.wear:wear:1.1.0'
+    implementation "androidx.core:core-ktx:+"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "org.bouncycastle:bcprov-jdk15on:1.68"
+    // https://mvnrepository.com/artifact/commons-codec/commons-codec
+    implementation group: 'commons-codec', name: 'commons-codec', version: '1.15'
+    // https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp-urlconnection
+    implementation group: 'com.squareup.okhttp3', name: 'okhttp-urlconnection', version: '4.9.2'
+
+
+}
+repositories {
+    mavenCentral()
+}

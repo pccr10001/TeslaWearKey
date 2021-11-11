@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="li.power.app.wearos.teslanak">
+
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+
+    <uses-feature android:name="android.hardware.type.watch"/>
+    <uses-permission android:name="android.permission.NFC" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <uses-feature
+            android:name="android.hardware.nfc"
+            android:required="false" />
+    <uses-feature
+            android:name="android.hardware.nfc.hce"
+            android:required="false" />
+
+    <application
+            android:allowBackup="true"
+            android:icon="@mipmap/ic_launcher"
+            android:label="@string/app_name"
+            android:supportsRtl="true"
+            android:theme="@android:style/Theme.DeviceDefault">
+        <uses-library
+                android:name="com.google.android.wearable"
+                android:required="true"/>
+
+        <!--
+               Set to true if your app is Standalone, that is, it does not require the handheld
+               app to run.
+        -->
+        <meta-data
+                android:name="com.google.android.wearable.standalone"
+                android:value="true"/>
+
+        <activity
+                android:name=".MainActivity"
+                android:clearTaskOnLaunch="true"
+                android:exported="true"
+                android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+
+        <service
+                android:name="li.power.app.wearos.teslanak.nfc.TeslaNAKService"
+                android:exported="true"
+                android:permission="android.permission.BIND_NFC_SERVICE">
+            <intent-filter>
+                <action android:name="android.nfc.cardemulation.action.HOST_APDU_SERVICE" />
+            </intent-filter>
+
+            <meta-data
+                    android:name="android.nfc.cardemulation.host_apdu_service"
+                    android:resource="@xml/nak_apdu_service" />
+        </service>
+    </application>
+
+</manifest>
