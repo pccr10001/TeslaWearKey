@@ -55,8 +55,7 @@ public class TeslaNAKService extends HostApduService {
     private static final String CURVE = "secp256r1";
 
     private KeyStore keyStore;
-    private boolean isInitialized = true;
-    private SecureRandom random = new SecureRandom();
+    private final SecureRandom random = new SecureRandom();
     private SharedPreferences sharedPreferences;
 
 
@@ -70,12 +69,10 @@ public class TeslaNAKService extends HostApduService {
 
             if (!keyStore.containsAlias(KEY_ALIAS)) {
                 Toast.makeText(this, "Please open app to generate the keypair", Toast.LENGTH_LONG).show();
-                isInitialized = false;
             }
 
         } catch (KeyStoreException | CertificateException | IOException | NoSuchAlgorithmException e) {
             Toast.makeText(this, "Error initializing keystore", Toast.LENGTH_LONG).show();
-            isInitialized = false;
             e.printStackTrace();
         }
 
@@ -232,21 +229,14 @@ public class TeslaNAKService extends HostApduService {
     private void setupBouncyCastle() {
         final Provider provider = Security.getProvider(BouncyCastleProvider.PROVIDER_NAME);
         if (provider == null) {
-            // Web3j will set up the provider lazily when it's first used.
             return;
         }
         if (provider.getClass().equals(BouncyCastleProvider.class)) {
-            // BC with same package name, shouldn't happen in real life.
             return;
         }
-        // Android registers its own BC provider. As it might be outdated and might not include
-        // all needed ciphers, we substitute it with a known BC bundled in the app.
-        // Android's BC has its package rewritten to "com.android.org.bouncycastle" and because
-        // of that it's possible to have another BC implementation loaded in VM.
         Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
         Security.insertProviderAt(new BouncyCastleProvider(), 1);
     }
-
 
     @Override
     public void onDeactivated(int reason) {
