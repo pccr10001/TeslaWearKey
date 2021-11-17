@@ -2,11 +2,14 @@ TeslaWearKey
 ===
 
 An app for Android Wear that allows you to wear a watch to unlock your Tesla Model 3.
+Based on HCE, the watch emulates as Tesla Key Card to interact with the vehicle.
 
 ---
 ### Features
 * Unlock / Lock your Tesla Model 3
 * Android KeyStore protected keys
+* No internet access required
+* Based on Tesla Key Card protocol
 
 ### Dependencies
 * NFC-enabled WearOS watch
