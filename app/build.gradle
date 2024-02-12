@@ -4,12 +4,13 @@ plugins {
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 31
+    compileSdk 34
     buildToolsVersion "31.0.0"
+    namespace "li.power.app.wearos.teslanak"
 
     defaultConfig {
         applicationId "li.power.app.wearos.teslanak"
-        minSdkVersion 24
+        minSdkVersion 31
         targetSdkVersion 31
         versionCode 1
         versionName "1.0"
