@@ -25,6 +25,14 @@ Based on HCE, ,the watch emulates as a Tesla Key Card to interact with the vehic
 * TIP: The side of the Galaxy Watches contains the NFC antenna.
 * TIP 2: The app must be in an ACTIVE state for NFC to work. It can easily go in to standby.
 
+### Download link
+* [Google Play](https://play.google.com/store/apps/details?id=li.power.app.wearos.teslanak) reviewing by Google now.
+* [Release Page](https://github.com/pccr10001/TeslaWearKey/releases)
+
 ### References
 * [GaussKeyCard](https://github.com/darconeous/gauss-key-card)
 * [TKC Protocol](https://gist.github.com/darconeous/2cd2de11148e3a75685940158bddf933) by [@darconeous](https://github.com/darconeous)
+
+### Contributors
+* @pccr10001
+* @nzjjay
