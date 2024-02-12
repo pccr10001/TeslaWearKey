@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 import android.widget.TextView;
+import androidx.core.splashscreen.SplashScreen;
 import li.power.app.wearos.teslanak.databinding.ActivityMainBinding;
 import org.apache.commons.codec.binary.Hex;
 
@@ -28,6 +29,8 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        SplashScreen.installSplashScreen(this);
 
         super.onCreate(savedInstanceState);
         sharedPreferences = getSharedPreferences(KEY_ALIAS, Context.MODE_PRIVATE);

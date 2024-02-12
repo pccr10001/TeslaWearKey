@@ -12,4 +12,8 @@
     inner_frame_layout_padding (below variable) on round screens.
     -->
     <dimen name="inner_frame_layout_padding">5dp</dimen>
+
+    <!-- Round app icon can take all of default space -->
+    <dimen name="splash_screen_icon_size">48dp</dimen>
+
 </resources>

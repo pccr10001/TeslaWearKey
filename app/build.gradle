@@ -40,6 +40,8 @@ dependencies {
     implementation "org.bouncycastle:bcprov-jdk15on:1.68"
     // https://mvnrepository.com/artifact/commons-codec/commons-codec
     implementation group: 'commons-codec', name: 'commons-codec', version: '1.15'
+    implementation "androidx.core:core-splashscreen:1.1.0-alpha02"
+
 
 }
 repositories {
