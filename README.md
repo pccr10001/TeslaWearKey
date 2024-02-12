@@ -1,20 +1,29 @@
 TeslaWearKey
 ===
 
-An app for Android Wear that allows you to wear a watch to unlock your Tesla Model 3.
-Based on HCE, the watch emulates as Tesla Key Card to interact with the vehicle.
+An app for Android Wear that allows the user to use their WearOS watch to unlock, lock, and drive supported Tesla vehicles.
+
+Based on HCE, ,the watch emulates as a Tesla Key Card to interact with the vehicle.
 
 ---
 ### Features
-* Unlock / Lock your Tesla Model 3
+* Unlock / Lock your Tesla Model 3 or Y.
 * Android KeyStore protected keys
-* No internet access required
+* No internet access or bluetooth required
 * Based on Tesla Key Card protocol
 
 ### Dependencies
 * NFC-enabled WearOS watch
+* Tested on Samsung Galaxy Watch 4 Classic LTE and Galaxy Watch 6
 
-* Tested on Samsung Galaxy Watch 4 Classic LTE
+### Usage Guide
+* Enable Developer mode on your watch
+* Connect to watch via ADB
+* Side-load apk file found in releases via ADB
+* Use existing key card to load watch in the vehicle system
+* Test extensively to ensure watch works effectively.
+* TIP: The side of the Galaxy Watches contains the NFC antenna.
+* TIP 2: The app must be in an ACTIVE state for NFC to work. It can easily go in to standby.
 
 ### References
 * [GaussKeyCard](https://github.com/darconeous/gauss-key-card)
