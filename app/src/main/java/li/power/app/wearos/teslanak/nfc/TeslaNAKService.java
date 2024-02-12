@@ -5,11 +5,7 @@ import android.nfc.cardemulation.HostApduService;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
-import li.power.app.wearos.teslanak.MainActivity;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
+
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.interfaces.ECPrivateKey;
 import org.bouncycastle.jce.interfaces.ECPublicKey;
@@ -18,19 +14,16 @@ import org.bouncycastle.jce.spec.ECParameterSpec;
 import org.bouncycastle.jce.spec.ECPrivateKeySpec;
 import org.bouncycastle.jce.spec.ECPublicKeySpec;
 import org.bouncycastle.math.ec.ECPoint;
-import org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider;
 import org.bouncycastle.util.encoders.Hex;
 
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
 import javax.smartcardio.CommandAPDU;
-import javax.smartcardio.ResponseAPDU;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
-import java.util.Arrays;
 
 /*
  *
