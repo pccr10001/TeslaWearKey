@@ -6,23 +6,16 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
-import android.util.Log;
 import android.widget.TextView;
-import androidx.annotation.RequiresApi;
 import li.power.app.wearos.teslanak.databinding.ActivityMainBinding;
 import org.apache.commons.codec.binary.Hex;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import javax.crypto.*;
 import java.io.IOException;
 import java.security.*;
 import java.security.cert.CertificateException;
-import java.security.spec.ECGenParameterSpec;
 
 public class MainActivity extends Activity {
-
-    private TextView mTextView;
-    private ActivityMainBinding binding;
 
     private static final String KEYSTORE_PROVIDER = "AndroidKeyStore";
     private static final String KEY_ALIAS = "tesla_nak";
@@ -39,9 +32,9 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         sharedPreferences = getSharedPreferences(KEY_ALIAS, Context.MODE_PRIVATE);
 
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        li.power.app.wearos.teslanak.databinding.ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        mTextView = binding.text;
+        TextView mTextView = binding.text;
 
         try {
             keyStore = KeyStore.getInstance(KEYSTORE_PROVIDER);
@@ -56,7 +49,7 @@ public class MainActivity extends Activity {
             mTextView.setText("Failed to generate keypair.");
             e.printStackTrace();
         }
-        mTextView.setText("Tesla Key Card is ready to use.");
+        mTextView.setText("Tesla key card is ready. Keep app active and present as required.");
     }
 
 
