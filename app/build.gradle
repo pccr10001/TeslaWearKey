@@ -10,10 +10,10 @@ android {
 
     defaultConfig {
         applicationId "li.power.app.wearos.teslanak"
-        minSdkVersion 31
-        targetSdkVersion 31
-        versionCode 3
-        versionName "1.2"
+        minSdkVersion 30
+        targetSdkVersion 30
+        versionCode 7
+        versionName "1.3"
 
     }
 

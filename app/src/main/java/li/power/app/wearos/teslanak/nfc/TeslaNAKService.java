@@ -74,10 +74,7 @@ public class TeslaNAKService extends HostApduService {
 
     @Override
     public byte[] processCommandApdu(byte[] commandApdu, Bundle extras) {
-        byte[] resp = process(commandApdu);
-        Log.d("Resp", Hex.toHexString(resp));
-        return resp;
-
+        return process(commandApdu);
     }
 
     private byte[] process(byte[] commandApdu) {
@@ -162,10 +159,7 @@ public class TeslaNAKService extends HostApduService {
         byte[] pubKey = new byte[65];
         System.arraycopy(buffer, 0, pubKey, 0, 65);
         byte[] challenge = new byte[16];
-        byte[] salt = new byte[4];
-        random.nextBytes(salt);
-        System.arraycopy(salt, 0, challenge, 0, 4);
-        System.arraycopy(buffer, 69, challenge, 4, 12);
+        System.arraycopy(buffer, 65, challenge, 0, 16);
         try {
             ECPrivateKey privKey = (ECPrivateKey) loadPrivateKey(decryptRSA(Hex.decode(sharedPreferences.getString(KEY_ALIAS, ""))));
             byte[] resp = new byte[18];

@@ -10,6 +10,13 @@ import android.widget.TextView;
 import androidx.core.splashscreen.SplashScreen;
 import li.power.app.wearos.teslanak.databinding.ActivityMainBinding;
 import org.apache.commons.codec.binary.Hex;
+import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
+import org.bouncycastle.crypto.generators.ECKeyPairGenerator;
+import org.bouncycastle.crypto.params.ECDomainParameters;
+import org.bouncycastle.crypto.params.ECKeyGenerationParameters;
+import org.bouncycastle.crypto.params.ECPrivateKeyParameters;
+import org.bouncycastle.jce.ECNamedCurveTable;
+import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
 
 import javax.crypto.*;
 import java.io.IOException;
@@ -30,9 +37,9 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+        super.onCreate(savedInstanceState);
         SplashScreen.installSplashScreen(this);
 
-        super.onCreate(savedInstanceState);
         sharedPreferences = getSharedPreferences(KEY_ALIAS, Context.MODE_PRIVATE);
 
         li.power.app.wearos.teslanak.databinding.ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
@@ -45,6 +52,7 @@ public class MainActivity extends Activity {
             if (!keyStore.containsAlias(KEY_ALIAS)) {
                 generateEccPrivateKey();
             }
+
         } catch (KeyStoreException | CertificateException | IOException | NoSuchAlgorithmException e) {
             mTextView.setText("Failed to initialize keystore.");
             e.printStackTrace();
@@ -57,11 +65,14 @@ public class MainActivity extends Activity {
 
 
     private void generateEccPrivateKey() throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException, NoSuchPaddingException, IllegalBlockSizeException, KeyStoreException, BadPaddingException, InvalidKeyException {
-        SecureRandom random = new SecureRandom();
-        byte[] pk = new byte[32];
-        random.nextBytes(pk);
+        ECNamedCurveParameterSpec curve = ECNamedCurveTable.getParameterSpec("secp256r1");
+        ECDomainParameters domainParams = new ECDomainParameters(curve.getCurve(), curve.getG(), curve.getN(), curve.getH(), curve.getSeed());
+        ECKeyGenerationParameters keyParams = new ECKeyGenerationParameters(domainParams, new SecureRandom());
+        ECKeyPairGenerator generator = new ECKeyPairGenerator();
+        generator.init(keyParams);
+        AsymmetricCipherKeyPair keyPair = generator.generateKeyPair();
         generateRsaKey();
-        sharedPreferences.edit().putString(KEY_ALIAS, Hex.encodeHexString(encryptRSA(pk))).apply();
+        sharedPreferences.edit().putString(KEY_ALIAS, Hex.encodeHexString(encryptRSA(((ECPrivateKeyParameters)keyPair.getPrivate()).getD().toByteArray()))).apply();
     }
 
     private byte[] encryptRSA(byte[] plainText) throws KeyStoreException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
