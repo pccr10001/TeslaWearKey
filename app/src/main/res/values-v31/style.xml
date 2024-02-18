@@ -5,7 +5,7 @@
         <item name="android:windowSplashScreenBackground">@android:color/black</item>
         <!-- Use windowSplashScreenAnimatedIcon to add a drawable or an animated
              drawable. -->
-        <item name="android:windowSplashScreenAnimatedIcon">@mipmap/logo</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/splash_screen</item>
         <item name="android:windowSplashScreenAnimationDuration">1000</item>
         <!-- Set the theme of the Activity that follows your splash screen. -->
         <item name="postSplashScreenTheme">@style/Theme.App</item>
