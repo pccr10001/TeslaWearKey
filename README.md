@@ -26,7 +26,9 @@ Based on HCE, ,the watch emulates as a Tesla Key Card to interact with the vehic
 * TIP 2: The app must be in an ACTIVE state for NFC to work. It can easily go in to standby.
 
 ### Download link
-* [Google Play](https://play.google.com/store/apps/details?id=li.power.app.wearos.teslanak) reviewing by Google now.
+
+<a href='https://play.google.com/store/apps/details?id=li.power.app.wearos.teslanak'><img alt='Get it on Google Play' height='80' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png'/></a>
+
 * [Release Page](https://github.com/pccr10001/TeslaWearKey/releases)
 
 ### References

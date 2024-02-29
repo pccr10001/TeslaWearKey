@@ -2,6 +2,17 @@
 <resources>
     <style name="Theme.App" parent="@android:style/Theme.DeviceDefault" />
 
+    <style name="WearAppTheme" parent="Theme.MaterialComponents.NoActionBar.Bridge">
+
+    </style>
+
+    <style name="WearAppTheme.Launcher" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_round</item>
+        <item name="windowSplashScreenBackground">@android:color/black</item>
+        <item name="postSplashScreenTheme">@style/WearAppTheme</item>
+        <item name="splashScreenIconSize">48dp</item>
+    </style>
+
     <style name="Theme.App.Starting" parent="Theme.SplashScreen">
         <!-- Set the splash screen background to black -->
         <item name="windowSplashScreenBackground">@android:color/black</item>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!--
     Because the window insets on round devices are larger than 15dp, this padding only applies
     to square screens.
@@ -13,7 +13,8 @@
     -->
     <dimen name="inner_frame_layout_padding">5dp</dimen>
 
-    <!-- Round app icon can take all of default space -->
-    <dimen name="splash_screen_icon_size">48dp</dimen>
+    <dimen name="splashscreen_icon_size" tools:override="true">48dp</dimen>
+    <dimen name="splashscreen_icon_size_no_background" tools:override="true">48dp</dimen>
+    <dimen name="splashscreen_icon_size_with_background" tools:override="true">48dp</dimen>
 
 </resources>

@@ -8,6 +8,7 @@ import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 import android.widget.TextView;
 import androidx.core.splashscreen.SplashScreen;
+import com.google.android.material.color.DynamicColors;
 import li.power.app.wearos.teslanak.databinding.ActivityMainBinding;
 import org.apache.commons.codec.binary.Hex;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
@@ -39,6 +40,7 @@ public class MainActivity extends Activity {
 
         super.onCreate(savedInstanceState);
         SplashScreen.installSplashScreen(this);
+        DynamicColors.applyIfAvailable(this);
 
         sharedPreferences = getSharedPreferences(KEY_ALIAS, Context.MODE_PRIVATE);
 
