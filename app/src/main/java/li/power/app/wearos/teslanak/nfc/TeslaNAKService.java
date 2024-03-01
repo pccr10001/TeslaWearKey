@@ -3,17 +3,8 @@ package li.power.app.wearos.teslanak.nfc;
 import android.content.SharedPreferences;
 import android.nfc.cardemulation.HostApduService;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
-
 import org.bouncycastle.jce.ECNamedCurveTable;
-import org.bouncycastle.jce.interfaces.ECPrivateKey;
-import org.bouncycastle.jce.interfaces.ECPublicKey;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.jce.spec.ECParameterSpec;
-import org.bouncycastle.jce.spec.ECPrivateKeySpec;
-import org.bouncycastle.jce.spec.ECPublicKeySpec;
-import org.bouncycastle.math.ec.ECPoint;
 import org.bouncycastle.util.encoders.Hex;
 
 import javax.crypto.*;
@@ -23,7 +14,9 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.*;
 import java.security.cert.CertificateException;
-import java.security.spec.InvalidKeySpecException;
+import java.security.interfaces.ECPrivateKey;
+import java.security.interfaces.ECPublicKey;
+import java.security.spec.*;
 
 /*
  *
@@ -54,7 +47,6 @@ public class TeslaNAKService extends HostApduService {
 
     @Override
     public void onCreate() {
-        setupBouncyCastle();
         sharedPreferences = getSharedPreferences(KEY_ALIAS, MODE_PRIVATE);
         try {
             keyStore = KeyStore.getInstance(KEYSTORE_PROVIDER);
@@ -104,32 +96,47 @@ public class TeslaNAKService extends HostApduService {
         return new byte[]{0x00, 0x01, (byte) 0x90, 0x00};
     }
 
-    public static PrivateKey loadPrivateKey(byte[] data) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
-        ECParameterSpec params = ECNamedCurveTable.getParameterSpec(CURVE);
+    public static PrivateKey loadPrivateKey(byte[] data) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException, InvalidParameterSpecException {
+        AlgorithmParameters parameters = AlgorithmParameters.getInstance("EC");
+        parameters.init(new ECGenParameterSpec("secp256r1"));
+        ECParameterSpec params = parameters.getParameterSpec(ECParameterSpec.class);
         ECPrivateKeySpec prvkey = new ECPrivateKeySpec(new BigInteger(data), params);
-        KeyFactory kf = KeyFactory.getInstance("EC", "BC");
+        KeyFactory kf = KeyFactory.getInstance("EC");
         return kf.generatePrivate(prvkey);
     }
 
     public static PublicKey loadPublicKey(byte[] data) throws Exception {
-        ECParameterSpec params = ECNamedCurveTable.getParameterSpec(CURVE);
-        ECPublicKeySpec pubKey = new ECPublicKeySpec(
-                params.getCurve().decodePoint(data), params);
-        KeyFactory kf = KeyFactory.getInstance("EC", "BC");
-        return kf.generatePublic(pubKey);
+
+        AlgorithmParameters parameters = AlgorithmParameters.getInstance("EC");
+        parameters.init(new ECGenParameterSpec("secp256r1"));
+        ECParameterSpec params = parameters.getParameterSpec(ECParameterSpec.class);
+        ECPublicKeySpec pubSpec = new ECPublicKeySpec(getPointFromEncoded(data), params);
+        KeyFactory kf = KeyFactory.getInstance("EC");
+        return (ECPublicKey) kf.generatePublic(pubSpec);
     }
 
     private ECPublicKey getPublicKeyFromPrivate(ECPrivateKey privateKey) throws Exception {
-        KeyFactory keyFactory = KeyFactory.getInstance("EC", "BC");
+        KeyFactory keyFactory = KeyFactory.getInstance("EC");
 
-        BigInteger d = privateKey.getD();
+        AlgorithmParameters parameters = AlgorithmParameters.getInstance("EC");
+        parameters.init(new ECGenParameterSpec("secp256r1"));
+        ECParameterSpec params = parameters.getParameterSpec(ECParameterSpec.class);
+
         org.bouncycastle.jce.spec.ECParameterSpec ecSpec =
-                privateKey.getParameters();
-        ECPoint Q = privateKey.getParameters().getG().multiply(d);
+                ECNamedCurveTable.getParameterSpec("secp256r1");
+        org.bouncycastle.math.ec.ECPoint q = ecSpec.getG().multiply(privateKey.getS());
+        ECPublicKeySpec spec = new ECPublicKeySpec(getPointFromEncoded(q.getEncoded(false)), params);
 
-        org.bouncycastle.jce.spec.ECPublicKeySpec pubSpec = new
-                org.bouncycastle.jce.spec.ECPublicKeySpec(Q, ecSpec);
-        return (ECPublicKey) keyFactory.generatePublic(pubSpec);
+        return (ECPublicKey) keyFactory.generatePublic(spec);
+    }
+
+    private static ECPoint getPointFromEncoded(byte[] encoded){
+        byte[] rawX = new byte[32];
+        byte[] rawY = new byte[32];
+        System.arraycopy(encoded,1,rawX, 0,32);
+        System.arraycopy(encoded,33,rawY, 0,32);
+
+        return new ECPoint(new BigInteger(1,rawX), new BigInteger(1,rawY));
     }
 
     private byte[] processGetPublicKey() {
@@ -139,7 +146,12 @@ public class TeslaNAKService extends HostApduService {
             ECPublicKey pubKey = getPublicKeyFromPrivate(privKey);
 
             byte[] resp = new byte[67];
-            System.arraycopy(pubKey.getQ().getEncoded(false), 0, resp, 0, 65);
+            byte[] x = pubKey.getW().getAffineX().toByteArray();
+            byte[] y = pubKey.getW().getAffineY().toByteArray();
+
+            System.arraycopy(x, 0, resp, 1, 32);
+            System.arraycopy(y, 0, resp, 33, 32);
+            resp[0] = 0x04;
             resp[65] = (byte) 0x90;
             resp[66] = 0x00;
 
@@ -175,7 +187,7 @@ public class TeslaNAKService extends HostApduService {
 
 
     private byte[] doECDH(PrivateKey privKey, byte[] pubKey) throws Exception {
-        KeyAgreement ka = KeyAgreement.getInstance("ECDH", "BC");
+        KeyAgreement ka = KeyAgreement.getInstance("ECDH");
         ka.init(privKey);
         ka.doPhase(loadPublicKey(pubKey), true);
         return ka.generateSecret();
@@ -213,17 +225,6 @@ public class TeslaNAKService extends HostApduService {
         return cipher.doFinal(ciphertext);
     }
 
-    private void setupBouncyCastle() {
-        final Provider provider = Security.getProvider(BouncyCastleProvider.PROVIDER_NAME);
-        if (provider == null) {
-            return;
-        }
-        if (provider.getClass().equals(BouncyCastleProvider.class)) {
-            return;
-        }
-        Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
-        Security.insertProviderAt(new BouncyCastleProvider(), 1);
-    }
 
     @Override
     public void onDeactivated(int reason) {
