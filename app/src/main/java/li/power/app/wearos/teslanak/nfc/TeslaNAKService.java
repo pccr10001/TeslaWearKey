@@ -3,8 +3,17 @@ package li.power.app.wearos.teslanak.nfc;
 import android.content.SharedPreferences;
 import android.nfc.cardemulation.HostApduService;
 import android.os.Bundle;
+
 import android.widget.Toast;
+
 import org.bouncycastle.jce.ECNamedCurveTable;
+import org.bouncycastle.jce.interfaces.ECPrivateKey;
+import org.bouncycastle.jce.interfaces.ECPublicKey;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.jce.spec.ECParameterSpec;
+import org.bouncycastle.jce.spec.ECPrivateKeySpec;
+import org.bouncycastle.jce.spec.ECPublicKeySpec;
+import org.bouncycastle.math.ec.ECPoint;
 import org.bouncycastle.util.encoders.Hex;
 
 import javax.crypto.*;
@@ -14,9 +23,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.*;
 import java.security.cert.CertificateException;
-import java.security.interfaces.ECPrivateKey;
-import java.security.interfaces.ECPublicKey;
-import java.security.spec.*;
+import java.security.spec.InvalidKeySpecException;
 
 /*
  *
@@ -47,6 +54,7 @@ public class TeslaNAKService extends HostApduService {
 
     @Override
     public void onCreate() {
+        setupBouncyCastle();
         sharedPreferences = getSharedPreferences(KEY_ALIAS, MODE_PRIVATE);
         try {
             keyStore = KeyStore.getInstance(KEYSTORE_PROVIDER);
@@ -96,47 +104,32 @@ public class TeslaNAKService extends HostApduService {
         return new byte[]{0x00, 0x01, (byte) 0x90, 0x00};
     }
 
-    public static PrivateKey loadPrivateKey(byte[] data) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException, InvalidParameterSpecException {
-        AlgorithmParameters parameters = AlgorithmParameters.getInstance("EC");
-        parameters.init(new ECGenParameterSpec("secp256r1"));
-        ECParameterSpec params = parameters.getParameterSpec(ECParameterSpec.class);
+    public static PrivateKey loadPrivateKey(byte[] data) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
+        ECParameterSpec params = ECNamedCurveTable.getParameterSpec(CURVE);
         ECPrivateKeySpec prvkey = new ECPrivateKeySpec(new BigInteger(data), params);
-        KeyFactory kf = KeyFactory.getInstance("EC");
+        KeyFactory kf = KeyFactory.getInstance("EC", "BC");
         return kf.generatePrivate(prvkey);
     }
 
     public static PublicKey loadPublicKey(byte[] data) throws Exception {
-
-        AlgorithmParameters parameters = AlgorithmParameters.getInstance("EC");
-        parameters.init(new ECGenParameterSpec("secp256r1"));
-        ECParameterSpec params = parameters.getParameterSpec(ECParameterSpec.class);
-        ECPublicKeySpec pubSpec = new ECPublicKeySpec(getPointFromEncoded(data), params);
-        KeyFactory kf = KeyFactory.getInstance("EC");
-        return (ECPublicKey) kf.generatePublic(pubSpec);
+        ECParameterSpec params = ECNamedCurveTable.getParameterSpec(CURVE);
+        ECPublicKeySpec pubKey = new ECPublicKeySpec(
+                params.getCurve().decodePoint(data), params);
+        KeyFactory kf = KeyFactory.getInstance("EC", "BC");
+        return kf.generatePublic(pubKey);
     }
 
     private ECPublicKey getPublicKeyFromPrivate(ECPrivateKey privateKey) throws Exception {
-        KeyFactory keyFactory = KeyFactory.getInstance("EC");
+        KeyFactory keyFactory = KeyFactory.getInstance("EC", "BC");
 
-        AlgorithmParameters parameters = AlgorithmParameters.getInstance("EC");
-        parameters.init(new ECGenParameterSpec("secp256r1"));
-        ECParameterSpec params = parameters.getParameterSpec(ECParameterSpec.class);
-
+        BigInteger d = privateKey.getD();
         org.bouncycastle.jce.spec.ECParameterSpec ecSpec =
-                ECNamedCurveTable.getParameterSpec("secp256r1");
-        org.bouncycastle.math.ec.ECPoint q = ecSpec.getG().multiply(privateKey.getS());
-        ECPublicKeySpec spec = new ECPublicKeySpec(getPointFromEncoded(q.getEncoded(false)), params);
+                privateKey.getParameters();
+        ECPoint Q = privateKey.getParameters().getG().multiply(d);
 
-        return (ECPublicKey) keyFactory.generatePublic(spec);
-    }
-
-    private static ECPoint getPointFromEncoded(byte[] encoded){
-        byte[] rawX = new byte[32];
-        byte[] rawY = new byte[32];
-        System.arraycopy(encoded,1,rawX, 0,32);
-        System.arraycopy(encoded,33,rawY, 0,32);
-
-        return new ECPoint(new BigInteger(1,rawX), new BigInteger(1,rawY));
+        org.bouncycastle.jce.spec.ECPublicKeySpec pubSpec = new
+                org.bouncycastle.jce.spec.ECPublicKeySpec(Q, ecSpec);
+        return (ECPublicKey) keyFactory.generatePublic(pubSpec);
     }
 
     private byte[] processGetPublicKey() {
@@ -146,12 +139,7 @@ public class TeslaNAKService extends HostApduService {
             ECPublicKey pubKey = getPublicKeyFromPrivate(privKey);
 
             byte[] resp = new byte[67];
-            byte[] x = pubKey.getW().getAffineX().toByteArray();
-            byte[] y = pubKey.getW().getAffineY().toByteArray();
-
-            System.arraycopy(x, 0, resp, 1, 32);
-            System.arraycopy(y, 0, resp, 33, 32);
-            resp[0] = 0x04;
+            System.arraycopy(pubKey.getQ().getEncoded(false), 0, resp, 0, 65);
             resp[65] = (byte) 0x90;
             resp[66] = 0x00;
 
@@ -171,7 +159,10 @@ public class TeslaNAKService extends HostApduService {
         byte[] pubKey = new byte[65];
         System.arraycopy(buffer, 0, pubKey, 0, 65);
         byte[] challenge = new byte[16];
-        System.arraycopy(buffer, 65, challenge, 0, 16);
+        byte[] salt = new byte[4];
+        random.nextBytes(salt);
+        System.arraycopy(salt, 0, challenge, 0, 4);
+        System.arraycopy(buffer, 69, challenge, 4, 12);
         try {
             ECPrivateKey privKey = (ECPrivateKey) loadPrivateKey(decryptRSA(Hex.decode(sharedPreferences.getString(KEY_ALIAS, ""))));
             byte[] resp = new byte[18];
@@ -187,7 +178,7 @@ public class TeslaNAKService extends HostApduService {
 
 
     private byte[] doECDH(PrivateKey privKey, byte[] pubKey) throws Exception {
-        KeyAgreement ka = KeyAgreement.getInstance("ECDH");
+        KeyAgreement ka = KeyAgreement.getInstance("ECDH", "BC");
         ka.init(privKey);
         ka.doPhase(loadPublicKey(pubKey), true);
         return ka.generateSecret();
@@ -225,6 +216,17 @@ public class TeslaNAKService extends HostApduService {
         return cipher.doFinal(ciphertext);
     }
 
+    private void setupBouncyCastle() {
+        final Provider provider = Security.getProvider(BouncyCastleProvider.PROVIDER_NAME);
+        if (provider == null) {
+            return;
+        }
+        if (provider.getClass().equals(BouncyCastleProvider.class)) {
+            return;
+        }
+        Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
+        Security.insertProviderAt(new BouncyCastleProvider(), 1);
+    }
 
     @Override
     public void onDeactivated(int reason) {
