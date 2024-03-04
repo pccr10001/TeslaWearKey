@@ -38,9 +38,9 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        super.onCreate(savedInstanceState);
         SplashScreen.installSplashScreen(this);
         DynamicColors.applyIfAvailable(this);
+        super.onCreate(savedInstanceState);
 
         sharedPreferences = getSharedPreferences(KEY_ALIAS, Context.MODE_PRIVATE);
 
@@ -64,7 +64,6 @@ public class MainActivity extends Activity {
         }
         mTextView.setText("Tesla key card is ready. Keep app active and present as required.");
     }
-
 
     private void generateEccPrivateKey() throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException, NoSuchPaddingException, IllegalBlockSizeException, KeyStoreException, BadPaddingException, InvalidKeyException {
         ECNamedCurveParameterSpec curve = ECNamedCurveTable.getParameterSpec("secp256r1");

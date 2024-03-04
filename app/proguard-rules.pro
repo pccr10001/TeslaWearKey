@@ -19,3 +19,9 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+-keep class org.bouncycastle.** { *; }
+-keep class org.conscrypt.** { *; }
+-keep class androidx.** { *; }
+-dontwarn org.conscrypt.**
+-dontwarn org.bouncycastle.**
+-keep,allowobfuscation,allowshrinking class kotlin.coroutines.Continuation
