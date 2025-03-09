@@ -6,6 +6,9 @@ import android.os.Bundle;
 
 import android.widget.Toast;
 
+import android.app.KeyguardManager;
+import android.content.Context;
+
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.interfaces.ECPrivateKey;
 import org.bouncycastle.jce.interfaces.ECPublicKey;
@@ -41,7 +44,8 @@ public class TeslaNAKService extends HostApduService {
     private static final byte[] SW_INS_NOT_SUPPORTED = new byte[]{(byte) 0x6D, (byte) 0x00};
     private static final byte[] SW_UNKNOWN = new byte[]{(byte) 0x6F, (byte) 0x00};
     private static final byte[] SW_WRONG_LENGTH = new byte[]{(byte) 0x67, (byte) 0x00};
-
+    private static final byte[] SW_CONDITIONS_NOT_SATISFIED = new byte[]{(byte) 0x69, (byte) 0x85};
+    
     private static final String KEYSTORE_PROVIDER = "AndroidKeyStore";
     private static final String KEY_ALIAS = "tesla_nak";
     private static final String RSA_MODE = "RSA/ECB/PKCS1Padding";
@@ -74,7 +78,20 @@ public class TeslaNAKService extends HostApduService {
 
     @Override
     public byte[] processCommandApdu(byte[] commandApdu, Bundle extras) {
+
+        if (isWatchLocked()) {
+
+            return SW_CONDITIONS_NOT_SATISFIED;
+        }
+
         return process(commandApdu);
+    }
+
+    private boolean isWatchLocked() {
+
+        KeyguardManager km = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
+
+        return km != null && km.isDeviceLocked();
     }
 
     private byte[] process(byte[] commandApdu) {
