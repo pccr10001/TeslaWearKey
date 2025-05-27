@@ -52,7 +52,6 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
 
         SplashScreen.installSplashScreen(this);
-        DynamicColors.applyIfAvailable(this);
         super.onCreate(savedInstanceState);
 
         sharedPreferences = getSharedPreferences(KEY_ALIAS, Context.MODE_PRIVATE);
