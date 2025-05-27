@@ -48,6 +48,7 @@ public class TeslaNAKService extends HostApduService {
     
     private static final String KEYSTORE_PROVIDER = "AndroidKeyStore";
     private static final String KEY_ALIAS = "tesla_nak";
+    private static final String UNLOCK_REQUIRED = "unlock_required";
     private static final String RSA_MODE = "RSA/ECB/PKCS1Padding";
     private static final String CURVE = "secp256r1";
 
@@ -79,7 +80,7 @@ public class TeslaNAKService extends HostApduService {
     @Override
     public byte[] processCommandApdu(byte[] commandApdu, Bundle extras) {
 
-        if (isWatchLocked()) {
+        if (isWatchLocked() && sharedPreferences.getBoolean(UNLOCK_REQUIRED, false)) {
 
             return SW_CONDITIONS_NOT_SATISFIED;
         }

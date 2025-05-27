@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="keystoreFailed">无法初始化 KeyStore</string>
+    <string name="keypairFailed">金钥产生失败</string>
+    <string name="launched">Tesla 钥匙已就绪，请保持程式开启</string>
+    <string name="unlockScreen">需要解锁萤幕?</string>
+    <string name="required">需要</string>
+    <string name="notRequired">不需要</string>
+</resources>

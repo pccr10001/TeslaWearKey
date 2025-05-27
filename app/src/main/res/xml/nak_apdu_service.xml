@@ -5,7 +5,7 @@
                    android:requireDeviceScreenOn="false">
     <aid-group android:description="@string/aiddescription"
                android:category="other">
-        <aid-filter android:name="F465736C614C6F6769633030325801"/>
+<!--        <aid-filter android:name="F465736C614C6F6769633030325801"/>-->
         <aid-filter android:name="7465736C614C6f676963"/>
         <aid-filter android:name="F465736C614C6f676963"/>
 
