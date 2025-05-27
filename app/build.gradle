@@ -34,7 +34,7 @@ dependencies {
     implementation 'androidx.wear:wear:1.1.0'
     implementation "org.bouncycastle:bcprov-jdk18on:1.77"
     implementation group: 'commons-codec', name: 'commons-codec', version: '1.15'
-    implementation "androidx.core:core-splashscreen:1.0.1"
+    implementation "androidx.core:core-splashscreen:1.2.0-beta02"
 }
 
 repositories {
