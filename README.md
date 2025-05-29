@@ -38,6 +38,7 @@ Based on HCE, ,the watch emulates as a Tesla Key Card to interact with the vehic
 ### Contributors
 * @pccr10001
 * @nzjjay
+* @felipefc10
 
 ### Support me
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/pwrli)
