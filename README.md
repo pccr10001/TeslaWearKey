@@ -14,7 +14,11 @@ Based on HCE, ,the watch emulates as a Tesla Key Card to interact with the vehic
 
 ### Dependencies
 * NFC-enabled WearOS watch
-* Tested on Samsung Galaxy Watch 4 Classic LTE and Galaxy Watch 6
+* Tested on following devices
+  * Pixel Watch 2 (Android 15, wearOS 5.1)
+  * Galaxy Watch 6 Classic (Android 14, wearOS 5.0, BXK1)
+  * Galaxy Watch 6 (Android 14, wearOS 5.0, BYD1)
+
 
 ### Usage Guide
 * Enable Developer mode on your watch
