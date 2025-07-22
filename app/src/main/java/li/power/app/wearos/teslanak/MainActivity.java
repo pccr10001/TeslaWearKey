@@ -62,7 +62,7 @@ public class MainActivity extends Activity {
         TextView mTextView = binding.text;
         Switch sw = binding.unlockSwitch;
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && NfcAdapter.getDefaultAdapter(this).isSecureNfcEnabled()) {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && checkSecureNfc()) {
                 sw.setChecked(true);
                 sw.setEnabled(false);
                 sharedPreferences.edit().putBoolean(UNLOCK_REQUIRED, true).apply();
@@ -127,5 +127,12 @@ public class MainActivity extends Activity {
         keyPairGenerator.generateKeyPair();
     }
 
+    private boolean checkSecureNfc(){
+        try{
+            return NfcAdapter.getDefaultAdapter(this).isSecureNfcEnabled();
+        } catch (RuntimeException e) {
+            return false;
+        }
+    }
 
 }
